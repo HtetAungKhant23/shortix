@@ -7,9 +7,12 @@ import (
 	"os"
 
 	"github.com/HtetAungKhant23/shortix/api"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	_ = godotenv.Load()
+
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
