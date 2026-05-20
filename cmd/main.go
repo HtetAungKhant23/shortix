@@ -7,6 +7,8 @@ import (
 	"os"
 
 	"github.com/HtetAungKhant23/shortix/api"
+	"github.com/HtetAungKhant23/shortix/shortener"
+	"github.com/HtetAungKhant23/shortix/store"
 	"github.com/joho/godotenv"
 )
 
@@ -19,7 +21,10 @@ func main() {
 	}
 
 	addr := fmt.Sprintf(":%s", port)
-	router := api.GetRootRouter()
+
+	memStore := store.NewInMemoryStore()
+	svc := shortener.New(memStore)
+	router := api.GetRootRouter(svc)
 
 	srv := &http.Server{
 		Addr:    addr,
