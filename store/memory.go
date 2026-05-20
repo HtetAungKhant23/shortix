@@ -18,5 +18,14 @@ func NewInMemoryStore() *InMemoryStore {
 }
 
 func (m *InMemoryStore) Save(url *shortener.URL) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if _, exists := m.entities[url.ShortCode]; exists {
+		return shortener.ErrCodeExists
+	}
+
+	cp := *url
+	m.entities[url.ShortCode] = &cp
 	return nil
 }

@@ -45,6 +45,10 @@ func (s *Service) Shorten(url string) (*URL, error) {
 		UpdatedAt: time,
 	}
 
+	if err = s.store.Save(entity); err != nil {
+		return nil, fmt.Errorf("failed to save entity: %s", err.Error())
+	}
+
 	return entity, nil
 }
 
