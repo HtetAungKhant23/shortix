@@ -24,28 +24,21 @@ func (h *Handler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 	req := &shortener.CreateRequest{}
 
 	if err := helper.ReadJSON(r, req); err != nil {
-		http.Error(w, "invalid request body", http.StatusBadRequest)
+		helper.WriteError(w, http.StatusBadRequest, errors.New("invalid request body"))
 		return
 	}
 
 	shortURL, err := h.service.Shorten(req.URL)
 	if err != nil {
 		if errors.Is(err, shortener.ErrInvalidURL) {
-			http.Error(w, "invalid or missing URL", http.StatusNotFound)
+			helper.WriteError(w, http.StatusNotFound, errors.New("invalid or missing URL"))
 			return
 		}
-		http.Error(w, "failed to create short URL", http.StatusInternalServerError)
+		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to create short URL"))
 		return
 	}
 
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusCreated)
-	b, err := json.Marshal(shortURL)
-	if err != nil {
-		panic(err)
-	}
-
-	w.Write(b)
+	helper.WriteJSON(w, http.StatusCreated, shortURL)
 }
 
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
