@@ -93,6 +93,22 @@ func (h *Handler) DeleteShortURL(w http.ResponseWriter, r *http.Request) {
 	helper.WriteJSON(w, http.StatusNoContent, struct{}{})
 }
 
+func (h *Handler) GetShortURLStatistics(w http.ResponseWriter, r *http.Request) {
+	code := helper.GetStringParam(r, "code")
+
+	entity, err := h.service.GetStatistics(code)
+	if err != nil {
+		if errors.Is(err, shortener.ErrNotFound) {
+			helper.WriteError(w, http.StatusNotFound, errors.New("short URL not found"))
+			return
+		}
+		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to get short URL statistics"))
+		return
+	}
+
+	helper.WriteJSON(w, http.StatusOK, entity)
+}
+
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{

@@ -25,6 +25,7 @@ func getApiRouter(svc *shortener.Service) *chi.Mux {
 	v1.Get("/shorten/{code}", h.GetOriginalURL)
 	v1.Put("/shorten/{code}", h.UpdateShortURL)
 	v1.Delete("/shorten/{code}", h.DeleteShortURL)
+	v1.Get("/shorten/{code}/stats", h.GetShortURLStatistics)
 
 	api.Mount("/v1", v1)
 

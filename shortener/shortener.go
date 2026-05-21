@@ -84,6 +84,10 @@ func (s *Service) Delete(code string) error {
 	return nil
 }
 
+func (s *Service) GetStatistics(code string) (*URL, error) {
+	return s.store.FindByCode(code)
+}
+
 func (s *Service) generateCode() (string, error) {
 	b := make([]byte, s.codeLen)
 	if _, err := rand.Read(b); err != nil {
