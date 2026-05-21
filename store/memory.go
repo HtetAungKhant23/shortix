@@ -29,3 +29,30 @@ func (m *InMemoryStore) Save(url *shortener.URL) error {
 	m.entities[url.ShortCode] = &cp
 	return nil
 }
+
+func (m *InMemoryStore) FindByCode(code string) (*shortener.URL, error) {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	entity, ok := m.entities[code]
+	if !ok {
+		return nil, shortener.ErrNotFound
+	}
+
+	cp := *entity
+
+	return &cp, nil
+}
+
+func (m *InMemoryStore) IncrementAccess(code string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	entity, ok := m.entities[code]
+	if !ok {
+		return shortener.ErrNotFound
+	}
+
+	entity.AccessCount++
+	return nil
+}

@@ -52,6 +52,17 @@ func (s *Service) Shorten(url string) (*URL, error) {
 	return entity, nil
 }
 
+func (s *Service) Retrieve(code string) (*URL, error) {
+	entity, err := s.store.FindByCode(code)
+	if err != nil {
+		return nil, err
+	}
+
+	_ = s.store.IncrementAccess(code)
+
+	return entity, nil
+}
+
 func (s *Service) generateCode() (string, error) {
 	b := make([]byte, s.codeLen)
 	if _, err := rand.Read(b); err != nil {

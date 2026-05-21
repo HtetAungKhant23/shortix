@@ -41,6 +41,21 @@ func (h *Handler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 	helper.WriteJSON(w, http.StatusCreated, shortURL)
 }
 
+func (h *Handler) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
+	code := helper.GetStringParam(r, "code")
+
+	shortURL, err := h.service.Retrieve(code)
+	if err != nil {
+		if errors.Is(err, shortener.ErrNotFound) {
+			helper.WriteError(w, http.StatusNotFound, errors.New("short URL not found"))
+			return
+		}
+		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to retrieve short URL"))
+	}
+
+	helper.WriteJSON(w, http.StatusOK, shortURL)
+}
+
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{
