@@ -56,3 +56,19 @@ func (m *InMemoryStore) IncrementAccess(code string) error {
 	entity.AccessCount++
 	return nil
 }
+
+func (m *InMemoryStore) Update(code string, newURL string) (*shortener.URL, error) {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	entity, ok := m.entities[code]
+	if !ok {
+		return nil, shortener.ErrNotFound
+	}
+
+	entity.URL = newURL
+	entity.AccessCount = 0
+
+	cp := *entity
+	return &cp, nil
+}

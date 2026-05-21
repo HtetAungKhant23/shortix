@@ -56,6 +56,28 @@ func (h *Handler) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 	helper.WriteJSON(w, http.StatusOK, shortURL)
 }
 
+func (h *Handler) UpdateShortURL(w http.ResponseWriter, r *http.Request) {
+	code := helper.GetStringParam(r, "code")
+
+	req := &shortener.UpdateRequest{}
+	if err := helper.ReadJSON(r, req); err != nil {
+		helper.WriteError(w, http.StatusBadRequest, errors.New("invaild request body"))
+		return
+	}
+
+	updatedShortURL, err := h.service.Update(code, req.URL)
+	if err != nil {
+		if errors.Is(err, shortener.ErrNotFound) {
+			helper.WriteError(w, http.StatusNotFound, errors.New("short URL not found"))
+			return
+		}
+		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to update with new URL"))
+		return
+	}
+
+	helper.WriteJSON(w, http.StatusOK, updatedShortURL)
+}
+
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{

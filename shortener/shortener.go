@@ -63,6 +63,19 @@ func (s *Service) Retrieve(code string) (*URL, error) {
 	return entity, nil
 }
 
+func (s *Service) Update(code string, newURl string) (*URL, error) {
+	if err := validateURL(newURl); err != nil {
+		return nil, err
+	}
+
+	updatedURL, err := s.store.Update(code, newURl)
+	if err != nil {
+		return nil, err
+	}
+
+	return updatedURL, nil
+}
+
 func (s *Service) generateCode() (string, error) {
 	b := make([]byte, s.codeLen)
 	if _, err := rand.Read(b); err != nil {
