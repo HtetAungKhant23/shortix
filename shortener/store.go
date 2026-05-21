@@ -13,4 +13,5 @@ type Store interface {
 	FindByCode(code string) (*URL, error)
 	IncrementAccess(code string) error
 	Update(code string, newURL string) (*URL, error)
+	Delete(code string) error
 }

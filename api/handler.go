@@ -78,6 +78,21 @@ func (h *Handler) UpdateShortURL(w http.ResponseWriter, r *http.Request) {
 	helper.WriteJSON(w, http.StatusOK, updatedShortURL)
 }
 
+func (h *Handler) DeleteShortURL(w http.ResponseWriter, r *http.Request) {
+	code := helper.GetStringParam(r, "code")
+
+	if err := h.service.Delete(code); err != nil {
+		if errors.Is(err, shortener.ErrNotFound) {
+			helper.WriteError(w, http.StatusNotFound, errors.New("short URL not found"))
+			return
+		}
+		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to delete short URL"))
+		return
+	}
+
+	helper.WriteJSON(w, http.StatusNoContent, struct{}{})
+}
+
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{

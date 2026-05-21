@@ -76,6 +76,14 @@ func (s *Service) Update(code string, newURl string) (*URL, error) {
 	return updatedURL, nil
 }
 
+func (s *Service) Delete(code string) error {
+	if err := s.store.Delete(code); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 func (s *Service) generateCode() (string, error) {
 	b := make([]byte, s.codeLen)
 	if _, err := rand.Read(b); err != nil {

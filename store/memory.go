@@ -72,3 +72,16 @@ func (m *InMemoryStore) Update(code string, newURL string) (*shortener.URL, erro
 	cp := *entity
 	return &cp, nil
 }
+
+func (m *InMemoryStore) Delete(code string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if _, ok := m.entities[code]; !ok {
+		return shortener.ErrNotFound
+	}
+
+	delete(m.entities, code)
+
+	return nil
+}
