@@ -38,7 +38,10 @@ func (h *Handler) CreateShortURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.WriteJSON(w, http.StatusCreated, shortURL)
+	helper.WriteJSON(w, http.StatusCreated, shortener.CreateShortURLResponse{
+		ResponseBase: helper.ResponseBase{Status: helper.ResponseStatusSuccess},
+		Data:         shortURL,
+	})
 }
 
 func (h *Handler) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
@@ -53,7 +56,10 @@ func (h *Handler) GetOriginalURL(w http.ResponseWriter, r *http.Request) {
 		helper.WriteError(w, http.StatusInternalServerError, errors.New("failed to retrieve short URL"))
 	}
 
-	helper.WriteJSON(w, http.StatusOK, shortURL)
+	helper.WriteJSON(w, http.StatusOK, shortener.GetOriginalURLResponse{
+		ResponseBase: helper.ResponseBase{Status: helper.ResponseStatusSuccess},
+		Data:         shortURL,
+	})
 }
 
 func (h *Handler) UpdateShortURL(w http.ResponseWriter, r *http.Request) {
@@ -75,7 +81,10 @@ func (h *Handler) UpdateShortURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.WriteJSON(w, http.StatusOK, updatedShortURL)
+	helper.WriteJSON(w, http.StatusOK, shortener.UpdateShortURLResponse{
+		ResponseBase: helper.ResponseBase{Status: helper.ResponseStatusSuccess},
+		Data:         updatedShortURL,
+	})
 }
 
 func (h *Handler) DeleteShortURL(w http.ResponseWriter, r *http.Request) {
@@ -90,7 +99,7 @@ func (h *Handler) DeleteShortURL(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	helper.WriteJSON(w, http.StatusNoContent, struct{}{})
+	helper.WriteJSON(w, http.StatusNoContent, helper.SuccessResponse)
 }
 
 func (h *Handler) GetShortURLStatistics(w http.ResponseWriter, r *http.Request) {
@@ -106,7 +115,10 @@ func (h *Handler) GetShortURLStatistics(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	helper.WriteJSON(w, http.StatusOK, entity)
+	helper.WriteJSON(w, http.StatusOK, shortener.GetShortURLStatsResponse{
+		ResponseBase: helper.ResponseBase{Status: helper.ResponseStatusSuccess},
+		Data:         entity,
+	})
 }
 
 func (h *Handler) HealthCheckHandler(w http.ResponseWriter, r *http.Request) {

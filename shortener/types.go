@@ -1,6 +1,10 @@
 package shortener
 
-import "time"
+import (
+	"time"
+
+	"github.com/HtetAungKhant23/shortix/api/helper"
+)
 
 type URL struct {
 	ID          string    `json:"id"`
@@ -15,6 +19,26 @@ type CreateRequest struct {
 	URL string `json:"url"`
 }
 
+type CreateShortURLResponse struct {
+	helper.ResponseBase
+	Data *URL `json:"data,omitempty"`
+}
+
 type UpdateRequest struct {
 	URL string `json:"url"`
+}
+
+type GetOriginalURLResponse struct {
+	helper.ResponseBase
+	Data *URL `json:"data,omitempty"`
+}
+
+type UpdateShortURLResponse struct {
+	helper.ResponseBase
+	Data *URL `json:"data,omitempty"`
+}
+
+type GetShortURLStatsResponse struct {
+	helper.ResponseBase
+	Data *URL `json:"data,omitempty"`
 }
