@@ -58,3 +58,27 @@ func TestShorten_UniqueShortCodes(t *testing.T) {
 		codes[entity.ShortCode] = struct{}{}
 	}
 }
+
+func TestRetrieve_GetOringailURL(t *testing.T) {
+	url := "https://roadmap.sh"
+
+	svc := newSvc()
+	created, _ := svc.Shorten(url)
+
+	entity, err := svc.Retrieve(created.ShortCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if entity.URL != url {
+		t.Errorf("got %s, want %s", entity.URL, url)
+	}
+}
+
+func TestRetrieve_ShortCodeNotFound(t *testing.T) {
+	svc := newSvc()
+	_, err := svc.Retrieve("does-not-exist")
+
+	if !errors.Is(err, shortener.ErrNotFound) {
+		t.Errorf("expected not found error message, got %v", err)
+	}
+}
