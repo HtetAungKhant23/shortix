@@ -41,3 +41,20 @@ func TestShorten_InvalidURL(t *testing.T) {
 		}
 	}
 }
+
+func TestShorten_UniqueShortCodes(t *testing.T) {
+	svc := newSvc()
+
+	codes := make(map[string]struct{})
+	for i := 1; i < 100; i++ {
+		entity, err := svc.Shorten("https://roadmap.sh")
+		if err != nil {
+			t.Fatalf("iteration %d: %v", i, err)
+		}
+
+		if _, duplicate := codes[entity.ShortCode]; duplicate {
+			t.Fatalf("duplicate short code %s at iteration %d", entity.ShortCode, i)
+		}
+		codes[entity.ShortCode] = struct{}{}
+	}
+}
