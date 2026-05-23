@@ -82,3 +82,46 @@ func TestRetrieve_ShortCodeNotFound(t *testing.T) {
 		t.Errorf("expected not found error message, got %v", err)
 	}
 }
+
+func TestUpdate_Success(t *testing.T) {
+	svc := newSvc()
+
+	oldURL := "https://roadmap.sh"
+	entity, err := svc.Shorten(oldURL)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	newURL := "https://example.sh"
+	updatedURL, err := svc.Update(entity.ShortCode, newURL)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	if updatedURL.ShortCode != entity.ShortCode {
+		t.Errorf("expected same short code, but got %s", updatedURL.ShortCode)
+	}
+
+	if updatedURL.URL != newURL {
+		t.Errorf("expected URL %s but got %s", newURL, updatedURL.URL)
+	}
+}
+
+func TestUpdate_NotFound(t *testing.T) {
+	svc := newSvc()
+
+	_, err := svc.Update("hsgeqh", "https://roadmap.sh")
+	if !errors.Is(err, shortener.ErrNotFound) {
+		t.Errorf("expected not found error message, but got %v", err)
+	}
+}
+
+func TestUpdate_InvalidURL(t *testing.T) {
+	svc := newSvc()
+	old, _ := svc.Shorten("https://example.com")
+
+	_, err := svc.Update(old.ShortCode, "bad-url")
+	if !errors.Is(err, shortener.ErrInvalidURL) {
+		t.Errorf("expected invalid URL error message, but got %v", err)
+	}
+}
