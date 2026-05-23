@@ -118,10 +118,46 @@ func TestUpdate_NotFound(t *testing.T) {
 
 func TestUpdate_InvalidURL(t *testing.T) {
 	svc := newSvc()
-	old, _ := svc.Shorten("https://example.com")
+	old, _ := svc.Shorten("https://roadmap.sh")
 
 	_, err := svc.Update(old.ShortCode, "bad-url")
 	if !errors.Is(err, shortener.ErrInvalidURL) {
 		t.Errorf("expected invalid URL error message, but got %v", err)
+	}
+}
+
+func TestDelete_Success(t *testing.T) {
+	svc := newSvc()
+	entity, _ := svc.Shorten("https://roadmap.sh")
+
+	if err := svc.Delete(entity.ShortCode); err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+
+	_, err := svc.Retrieve(entity.ShortCode)
+	if !errors.Is(err, shortener.ErrNotFound) {
+		t.Errorf("after delete, Retrieve returned %v, expected not found error message", err)
+	}
+}
+
+func TestDelete_NotFound(t *testing.T) {
+	svc := newSvc()
+	err := svc.Delete("hsgeqh")
+	if !errors.Is(err, shortener.ErrNotFound) {
+		t.Errorf("expected not found error message, but got %v", err)
+	}
+}
+
+func TestStats_Success(t *testing.T) {
+	svc := newSvc()
+	entity, _ := svc.Shorten("https://roadmap.sh")
+	svc.Retrieve(entity.ShortCode)
+
+	stats, err := svc.GetStatistics(entity.ShortCode)
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if stats.AccessCount != 1 {
+		t.Errorf("expected access count = 1, but got = %d", stats.AccessCount)
 	}
 }
