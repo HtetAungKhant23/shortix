@@ -2,6 +2,7 @@ package shortener_test
 
 import (
 	"errors"
+	"sync"
 	"testing"
 
 	"github.com/HtetAungKhant23/shortix/shortener"
@@ -159,5 +160,31 @@ func TestStats_Success(t *testing.T) {
 	}
 	if stats.AccessCount != 1 {
 		t.Errorf("expected access count = 1, but got = %d", stats.AccessCount)
+	}
+}
+
+func TestShorten_Concurrent(t *testing.T) {
+	svc := newSvc()
+
+	originalURL := "https://roadmap.sh"
+
+	errs := make(chan error, 50)
+	wg := sync.WaitGroup{}
+
+	for range 50 {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			if _, err := svc.Shorten(originalURL); err != nil {
+				errs <- err
+			}
+		}()
+	}
+
+	wg.Wait()
+	close(errs)
+
+	for err := range errs {
+		t.Errorf("concurrent Shorten error: %v", err)
 	}
 }
